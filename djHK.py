@@ -11,7 +11,7 @@ import pandas as pd
 import warnings
 #Новый коэфициент трения, ошибка меньше. Старый убрать
 
-warnings.filterwarnings("ignore", category=RuntimeWarning) 
+# warnings.filterwarnings("ignore", category=RuntimeWarning) 
 
 class HasanKabirAnn(FluidFlow):
     """
@@ -166,9 +166,7 @@ class HasanKabirAnn(FluidFlow):
     
         :param num_Re: число Рейнольдса, посчитанное по разным плотностям
         """
-        self.Fca = (16 * (1 - self.k_ratio_d) ** 2 /
-                    ((1 - self.k_ratio_d ** 4) / (1 - self.k_ratio_d ** 2) -
-                     (1 - self.k_ratio_d ** 2) / m.log(1 / self.k_ratio_d)))
+
         right_part = (4 * m.log(self.num_Re* (initial_ff * (16 / self.Fca) **
                      (0.45 * m.exp(-(self.num_Re - 3000) / 10 ** 6))) ** 0.5) - 0.4)
         left_part = 1 / (initial_ff * (16 / self.Fca) ** (0.45 * m.exp(-(self.num_Re - 
@@ -184,6 +182,9 @@ class HasanKabirAnn(FluidFlow):
         mu_mix_pasec = (self.vs_liq_msec / self.v_mix_msec * self.mu_liq_pasec 
                             + self.vs_gas_msec / self.v_mix_msec * self.mu_gas_pasec)
         self.num_Re = self.frict.calc_n_re(rho, self.v_mix_msec, mu_mix_pasec)
+        self.Fca = (16 * (1 - self.k_ratio_d) ** 2 /
+                    ((1 - self.k_ratio_d ** 4) / (1 - self.k_ratio_d ** 2) -
+                     (1 - self.k_ratio_d ** 2) / m.log(1 / self.k_ratio_d)))
         if self.num_Re < 3000:  # laminar flow
             fric = self.Fca / self.num_Re
         else:  # turbulent flow
@@ -276,10 +277,10 @@ class HasanKabirAnn(FluidFlow):
                     * CONST.g * self.sigma_Nm / (self.rho_liq_kgm3) ** 2) ** 0.25 * self.h_ls ** 0.5 * (1 - self.h_ls)) 
         self.v_gls = (1.53 * ((self.rho_liq_kgm3 - self.rho_gas_kgm31) * CONST.g * self.theta / (self.rho_liq_kgm3) #20
                         ** 2) ** 0.25 * self.h_ls ** 0.5) - self.v_lls
-        try:
-            self.act_len_lf = fabs(float(sp.broyden1(self._actual_film_length, 0.5)))
-        except:
-            self.act_len_lf = 0.0000001
+        # try:
+        self.act_len_lf = fabs(float(sp.broyden1(self._actual_film_length, 0.5)))
+        # except:
+        #     self.act_len_lf = 0.0000001
         v_llf = (CONST.g * 2 * self.act_len_lf) ** 0.5 - self.v_dt_msec #47
         self.grad_p_acc = (self.rho_liq_kgm3 * (h_lf / len_su) * (v_llf - self.v_dt_msec) 
                     * (v_llf - self.v_lls))
@@ -418,7 +419,7 @@ class HasanKabirAnn(FluidFlow):
         self.result_grad_pam = self.friction_grad_pam  + self.density_grad_pam + self.acceleration_grad_pam
 
         
-        print(p/101325)
+        # print(p/101325)
         # print(self.density_grad_pam)
         # print(self.flow_pattern_name)
         # print(self.acceleration_grad_pam)
@@ -470,9 +471,9 @@ if __name__ == '__main__':
     p4 = []
     rbb4 =[]
     
-    for i in range(200,300, 100):
+    for i in range(0,200, 10):
         rb =i
-        test2 = HasanKabirAnn(rp =rb, qu_liq_m3day=570,wct = 0.4, h =2400)
+        test2 = HasanKabirAnn(rp =rb, qu_liq_m3day=100,wct = 0.1, h =2400)
         vr = test2.func_p_list()
         vr1 = vr[0]
         vr2 = vr1[0]
@@ -539,6 +540,6 @@ if __name__ == '__main__':
 
     # writer.save()
 
-#     df = pd.DataFrame({'GOR': rbb,
-#                    'p down': p})
-#     df.to_excel('./test.xlsx')
+    df = pd.DataFrame({'GOR': rbb1,
+                   'p down': p1})
+    df.to_excel('./test7.xlsx')
