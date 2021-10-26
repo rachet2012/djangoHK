@@ -425,11 +425,11 @@ class HasanKabirAnn(FluidFlow):
         return sol.y, 
 
     def down_pr(self):
-        self.func_p_list()
-        vr1 = vr[0]
-        vr2 = vr1[0]
-        vr3= vr2[-1]
-        return float(vr3)
+        vr111=self.func_p_list()
+        vr11 = vr111[0]
+        vr21 = vr11[0]
+        vr31= vr21[-1]
+        return float(vr31)
 
 
 if __name__ == '__main__':
@@ -446,6 +446,8 @@ if __name__ == '__main__':
     for i in range(100,110, 10):
         rb =i
         test2 = HasanKabirAnn(rp =rb, qu_liq_m3day=285,wct = 0.5)
+        kk = test2.down_pr()
+        print(kk)
         vr = test2.func_p_list()
         vr1 = vr[0]
         vr2 = vr1[0]
