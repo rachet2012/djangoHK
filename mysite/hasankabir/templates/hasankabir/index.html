@@ -13,78 +13,12 @@
     {{ form.as_p }}
   <button type="submit">Рассчитать</button>
 
- <form oninput="result.value=(cm.value/2.54).toFixed(2)">
-    <p>Забойное давление: <output name="result"></output></p>
+ <form >
+    <p>Забойное давление: <output name="result">{{ result }}</output> атм </p>
   </form>
 
  </body>
-</html> -->
+</html> 
 
 
-
-
-
-
-<!-- <table class="table table-striped table-condensed table-bordered">
-  <thead>
-  <tr>
-  <th>Параметр</th>
-  <th>Значение</th>
-  <th>Размерность</th>
-  </tr>
-  </thead>
-  <tbody><tr>
-  <td>Дебит скважины по жидкости</td>
-  <td>
-  <input type="number" name="qu_liq_m3day" class="form-control parameterUnit">
-  </td>
-  <td>м3/сут</td>
-  </tr>
-  <td>Внешний диаметр НКТ</td>
-  <td>
-  <input type="number" name="d_i_m" class="form-control parameterUnit">
-  </td>
-  <td>м</td>
-  </tr>
-  <td>Внутренний диаметр ЭК</td>
-  <td>
-  <input type="number" name="d_o_m" class="form-control parameterUnit">
-  </td>
-  <td>м</td>
-  </tr>
-  <td>Глубина скважины</td>
-  <td>
-  <input type="number" name="h" class="form-control parameterUnit">
-  </td>
-  <td>м</td>
-  </tr>
-  <td>Давление на устье</td>
-  <td>
-  <input type="number" name="p_head" class="form-control parameterUnit">
-  </td>
-  <td>атм</td>
-  </tr>
-  <td>Температура на устье</td>
-  <td>
-  <input type="number" name="t_head" class="form-control parameterUnit">
-  </td>
-  <td>C</td>
-  </tr>
-  <td>Обводненность продукции</td>
-  <td>
-  <input type="number" name="wct" class="form-control parameterUnit">
-  </td>
-  <td>дол.ед</td>
-  </tr>
-  <td>Газовый фактор</td>
-  <td>
-  <input type="number" name="rp" class="form-control parameterUnit">
-  </td>
-  <td>м3/м3</td>
-  </tr>
-
-  
-  <tr><td>Забойное давление</td><td class="result"> <input class="form-control result_output" disabled=""></td><td>
-  <button type="button" class="unit_calculate">Рассчитать</button></td></tr></tbody></table>
- -->
 

@@ -33,8 +33,8 @@ def index(request):
                              t_head=t_headd, wct=wctd, rp= rpd)
         vr = float(well.down_pr())
         data.results = vr
-
         data.save()
+        context [ 'result' ] = vr
 
     else:
         form = DataForm()

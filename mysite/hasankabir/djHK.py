@@ -152,7 +152,11 @@ class HasanKabirAnn(FluidFlow):
                                     self.rho_gas_kgm31) / (self.rho_gas_kgm31) ** 2) ** 0.25 + 1
 
         #bubble/slug to dispersed transition [6]
-        self.v_m_krit2disp_msec = fabs(float(sp.fsolve(self._mixture_velocity_Caetano, 10, maxfev=20)))
+        try:
+            self.v_m_krit2disp_msec = fabs(float(sp.fsolve(self._mixture_velocity_Caetano, 10)))
+        except:
+            self.v_m_krit2disp_msec = 10
+        # self.v_m_krit2disp_msec = fabs(float(sp.broyden1(self._mixture_velocity_Caetano, 10)))
         # self.v_m_krit2disp_msec = 5
 
         self._set_flow_pattrn()
@@ -429,7 +433,7 @@ class HasanKabirAnn(FluidFlow):
         vr11 = vr111[0]
         vr21 = vr11[0]
         vr31= vr21[-1]
-        return float(vr31)
+        return float(vr31)/101325
 
 
 if __name__ == '__main__':
