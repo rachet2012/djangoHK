@@ -11,7 +11,7 @@ import pandas as pd
 import warnings
 #Новый коэфициент трения, ошибка меньше. Старый убрать
 
-# warnings.filterwarnings("ignore", category=RuntimeWarning) 
+warnings.filterwarnings("ignore", category=RuntimeWarning) 
 
 class HasanKabirAnn(FluidFlow):
     """
@@ -277,10 +277,10 @@ class HasanKabirAnn(FluidFlow):
                     * CONST.g * self.sigma_Nm / (self.rho_liq_kgm3) ** 2) ** 0.25 * self.h_ls ** 0.5 * (1 - self.h_ls)) 
         self.v_gls = (1.53 * ((self.rho_liq_kgm3 - self.rho_gas_kgm31) * CONST.g * self.theta / (self.rho_liq_kgm3) #20
                         ** 2) ** 0.25 * self.h_ls ** 0.5) - self.v_lls
-        # try:
-        self.act_len_lf = fabs(float(sp.broyden1(self._actual_film_length, 0.5)))
-        # except:
-        #     self.act_len_lf = 0.0000001
+        try:
+            self.act_len_lf = fabs(float(sp.broyden1(self._actual_film_length, 0.5)))
+        except:
+            self.act_len_lf = 0.0000001
         v_llf = (CONST.g * 2 * self.act_len_lf) ** 0.5 - self.v_dt_msec #47
         self.grad_p_acc = (self.rho_liq_kgm3 * (h_lf / len_su) * (v_llf - self.v_dt_msec) 
                     * (v_llf - self.v_lls))
@@ -540,6 +540,6 @@ if __name__ == '__main__':
 
     # writer.save()
 
-    df = pd.DataFrame({'GOR': rbb1,
-                   'p down': p1})
-    df.to_excel('./test7.xlsx')
+    # df = pd.DataFrame({'GOR': rbb1,
+    #                'p down': p1})
+    # df.to_excel('./test7.xlsx')
