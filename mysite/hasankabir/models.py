@@ -20,6 +20,13 @@ class Database(models.Model):
     t_head = models.FloatField()  
     wct = models.FloatField()  
     rp = models.FloatField() 
+    absep = models.FloatField()
+    md1 = models.FloatField()
+    md2 = models.FloatField()
+    md3 = models.FloatField()
+    tvd1 = models.FloatField()
+    tvd2 = models.FloatField()
+    tvd3 = models.FloatField()
     results = models.CharField(max_length=1000000)
 
 
