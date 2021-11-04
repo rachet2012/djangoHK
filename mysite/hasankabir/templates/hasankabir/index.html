@@ -16,7 +16,9 @@
  <form >
     <p>Забойное давление: <output name="result">{{ result }}</output> атм </p>
   </form>
-
+  <form class="column">
+    {{ plot | safe }}
+  </form>
  </body>
 </html> 
 

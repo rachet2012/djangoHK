@@ -51,21 +51,27 @@ def index(request):
         data.save()
         context [ 'result' ] = ttt
 
+        lp = list(schet(rp = rpd,qu_liq_r=qu_liq_m3dayd, wct_r=wctd, p_head_r = p_headd, t_head_r=(t_headd + 273),
+                     d_i_r = d_i_md, d_o_r=d_o_md, absep_r = absepd, md1 = md1d,
+                     md2 = md2d, md3 = md3d, tvd1 = tvd1d, tvd2 = tvd2d, tvd3=tvd3d)[1])
+        lp[0] =lp[0]*101325
+        lp2 = []
+        lh = [i for i in range(0, int(tvd3d+50), 300)]
 
-        for t in x_list:
-            stable_rate = StableRate()
-            y_list.append((Po + Pt11(N, t, k, por, mu, Ct, Bo, rw, re, h, Po, q))/101325)
-            stable_rate.x = t
-            stable_rate.y = y_list[-1]
-            stable_rate.save()
+        for i in lp:
+            b = i/101325
+            lp2.append(b)
+
         data = []
-        data.append(Scattergl(y=y_list, x=x_list, mode='lines',
+        data.append(Scattergl(y=lh, x=lp2, mode='lines',
                             line={'dash': 'solid', 'color': '#AF479D'}))
         layout = Layout(width=800, height=600, legend=dict(orientation="h", y=1.1),
-            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', )
+            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',)
         figure = Figure(data=data, layout=layout)
         figure.update_xaxes(linewidth=2, linecolor='#A6A8AB', gridcolor='#A6A8AB')
         figure.update_yaxes(linewidth=2, linecolor='#A6A8AB', gridcolor='#A6A8AB')
+        figure.update_yaxes(autorange="reversed")
+        figure.update_xaxes(side = 'top')
         plot_fig = plot(figure, auto_open=False, output_type='div')
         context['plot'] = plot_fig
     else:

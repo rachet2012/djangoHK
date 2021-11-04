@@ -366,7 +366,7 @@ def func_p_list(p_head, t_head, h, d_i, d_o, PVT, traj, absep):
         p0,t0 = p_head, t_head
         h0 = 0
         h1 = h
-        steps = [i for i in range(h0, h1+50, 50)]
+        steps = [i for i in range(h0, h1+50, 300)]
         sol = solve_ivp(grad_func, 
             t_span=(h0, h1), 
             y0=[p0, t0], 
@@ -403,8 +403,8 @@ def schet(rp,qu_liq_r,wct_r,p_head_r,t_head_r ,d_i_r, d_o_r, absep_r, md1, md2, 
     return vr3/101325 , vr2
 #TECT
 if __name__ == "__main__":
-    for i in range(300, 310,10):
-        ttt = schet(i,qu_liq_r=300, wct_r=0.5, p_head_r = 15, t_head_r=293, d_i_r = 73,
+    for i in range(10, 20,10):
+        ttt = schet(i,qu_liq_r=300, wct_r=0.6, p_head_r = 15, t_head_r=293, d_i_r = 73,
                  d_o_r=142,absep_r = 2.54, md1 = 1400, md2 = 1800, md3 = 2400, tvd1 = 1400,
                   tvd2 = 1800, tvd3=2400)[1]
         lp = list(ttt)
