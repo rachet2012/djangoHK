@@ -15,7 +15,6 @@ class Database(models.Model):
     qu_liq_m3day = models.FloatField()  
     d_i_m = models.FloatField()  
     d_o_m = models.FloatField()  
-    h = models.FloatField()  
     p_head = models.FloatField()  
     t_head = models.FloatField()  
     wct = models.FloatField()  

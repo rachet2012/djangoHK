@@ -1,3 +1,4 @@
+from collections import namedtuple
 from django.shortcuts import render
 from hasankabir.forms import DataForm
 from hasankabir.models import Database
@@ -14,7 +15,6 @@ def index(request):
         qu_liq_m3dayd = float(form['qu_liq_m3day'].value())
         d_i_md  = float(form['d_i_m'].value()) 
         d_o_md = float(form['d_o_m'].value())
-        hd = int(form['h'].value())
         p_headd = float(form['p_head'].value()) 
         t_headd = float(form['t_head'].value()) 
         wctd = float(form['wct'].value())
@@ -31,7 +31,6 @@ def index(request):
         data.qu_liq_m3day = qu_liq_m3dayd
         data.d_i_m = d_i_md
         data.d_o_m = d_o_md
-        data.h = hd
         data.p_head = p_headd
         data.t_head = t_headd
         data.wct = wctd
@@ -44,34 +43,37 @@ def index(request):
         data.tvd2 = tvd2d
         data.tvd3 = tvd3d
 
-        ttt = schet(rp = rpd,qu_liq_r=qu_liq_m3dayd, wct_r=wctd, p_head_r = p_headd, t_head_r=(t_headd + 273),
+        ttt = schet(rp = rpd,qu_liq_r=qu_liq_m3dayd, wct_r=wctd, p_head_r = (p_headd*101325), t_head_r=(t_headd + 273),
                      d_i_r = d_i_md, d_o_r=d_o_md, absep_r = absepd, md1 = md1d,
                      md2 = md2d, md3 = md3d, tvd1 = tvd1d, tvd2 = tvd2d, tvd3=tvd3d)[0]
         data.results = ttt
         data.save()
         context [ 'result' ] = ttt
 
-        lp = list(schet(rp = rpd,qu_liq_r=qu_liq_m3dayd, wct_r=wctd, p_head_r = p_headd, t_head_r=(t_headd + 273),
+        lp = list(schet(rp = rpd,qu_liq_r=qu_liq_m3dayd, wct_r=wctd, p_head_r = (p_headd*101325), t_head_r=(t_headd + 273),
                      d_i_r = d_i_md, d_o_r=d_o_md, absep_r = absepd, md1 = md1d,
                      md2 = md2d, md3 = md3d, tvd1 = tvd1d, tvd2 = tvd2d, tvd3=tvd3d)[1])
-        lp[0] =lp[0]*101325
         lp2 = []
-        lh = [i for i in range(0, int(tvd3d+50), 300)]
+        lh = [i for i in range(0, int(tvd3d+50), 50)]
 
         for i in lp:
             b = i/101325
             lp2.append(b)
 
         data = []
-        data.append(Scattergl(y=lh, x=lp2, mode='lines',
-                            line={'dash': 'solid', 'color': '#AF479D'}))
-        layout = Layout(width=800, height=600, legend=dict(orientation="h", y=1.1),
+        data.append(Scattergl(y=lh, x=lp2, mode='lines + markers',
+                            line={'dash': 'solid', 'color': '#4B0082'},
+                            marker = {'color': '#FF0000',} ))
+        layout = Layout(width=800, height=600, legend=dict(orientation="h", y=0),
             paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',)
         figure = Figure(data=data, layout=layout)
-        figure.update_xaxes(linewidth=2, linecolor='#A6A8AB', gridcolor='#A6A8AB')
-        figure.update_yaxes(linewidth=2, linecolor='#A6A8AB', gridcolor='#A6A8AB')
-        figure.update_yaxes(autorange="reversed")
-        figure.update_xaxes(side = 'top')
+        figure.update_xaxes(linewidth=2, linecolor='#A6A8AB', gridcolor='#A6A8AB', range=[0, ttt+50])
+        figure.update_yaxes(linewidth=2, linecolor='#A6A8AB', gridcolor='#A6A8AB', range=[0, tvd3d+50])
+        figure.update_yaxes(autorange="reversed", zeroline=True, zerolinewidth=2, zerolinecolor='LightPink')
+        figure.update_xaxes(side = 'top', zeroline=True, zerolinewidth=2, zerolinecolor='LightPink')
+        figure.update_layout(xaxis_title="Давление, атм",
+                  yaxis_title="Глубина, м", title ='КРД')
+        figure.update_traces(hoverinfo="all", hovertemplate="Давление, атм: %{x}<br>Глубина,м: %{y}")
         plot_fig = plot(figure, auto_open=False, output_type='div')
         context['plot'] = plot_fig
     else:
