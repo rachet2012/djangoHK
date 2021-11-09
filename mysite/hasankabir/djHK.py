@@ -321,7 +321,7 @@ class HasanKabirAnn():
 
 
 
-def grad_func(h, pt, PVT, traj, corr,d_o, d_i):
+def grad_func(h, pt, PVT, traj, corr,d_o, d_i,md_tvd):
         """
         Интегрируемае функция
         :param h: текущая глубина, м
@@ -334,25 +334,28 @@ def grad_func(h, pt, PVT, traj, corr,d_o, d_i):
         :return: градиент температуры в заданной точке трубы
         при заданных термобарических условиях, К/м
         """
-        h_steps = [0]
-        h_steps.append(h)
-        h_prev = h_steps[-1]
-        theta = traj.calc_angle(h_prev,h)
-        # print(theta)
+        md_steps = [0]
+        md = interp.interp1d(
+                md_tvd["TVD"], md_tvd["MD"], fill_value="extrapolate", kind="previous"
+                )(h)
+        md_prev = md_steps[-1]
+        md_steps.append(md)
+        theta = traj.calc_angle(md_prev,md)
+        print(theta)
         PVT.calc_flow(pt[0],pt[1])
         corr.theta = theta
         corr.fluid = PVT
         corr.d_o_m = interp.interp1d(
                 d_o["MD"], d_o["d_o"], fill_value="extrapolate", kind="previous"
-                )(h)
+                )(md)
         corr.d_i_m =interp.interp1d(
                 d_i["MD"], d_i["d_i"], fill_value="extrapolate", kind="previous"
-                )(h)
+                )(md)
         dp_dl = corr.calc_pressure_gradient()
         dt_dl = 0.03
         return dp_dl, dt_dl
 
-def func_p_list(p_head, t_head, h, PVT, traj, corr, d_o, d_i):
+def func_p_list(p_head, t_head, h, PVT, traj, corr, d_o, d_i,md_tvd):
         """
         Функция для интегрирования давления, температуры в трубе
         :param p_head: давление на устье, Па
@@ -379,13 +382,38 @@ def func_p_list(p_head, t_head, h, PVT, traj, corr, d_o, d_i):
             corr,
             d_o,
             d_i,
+            md_tvd,
             )
         )
         return sol.y,
 
 def schet(rp,qu_liq_r,wct_r,p_head_r,t_head_r , absep_r, gamma_gas, gamma_wat, gamma_oil, pb,
          t_res, rsb, muob, bob, md1, md2, md3, tvd1, tvd2, tvd3, d_o_1, d_o_2, d_o_3, d_i_1, d_i_2, d_i_3):
+        """
+        Функция для инициилизации расчета
+        :param rp: ГФ, м3/м3
+        :param qu_liq_r: дебит жидкости, м3/сут
+        :param wct_r: обводненнность продукции, дол.ед
+        :param p_head_r: давление на устье, Па
+        :param t_head_r: температура на устье, К
+        :param absep_r: абсолютная шероховатость стенок трубы, м*10^-5
+        :param gamma_gas: относительная плотность газа, дол.ед
+        :param gamma_wat: относительная плотность воды, дол.ед
+        :param gamma_oil: относительная плотность нефти, дол.ед
+        :param pb: давление насыщения, Па
+        :param t_res: пластовая температура, К
+        :param rsb: калибровочное значение газо-ния при дав-ии нас-я, ст. м3 газа/ст. м3 нефти
+        :param muob: калибровочное значение вязкости нефти, сПз
+        :param bob: калибровочное значение объемного коэффициента нефти, ст.м3/ст.м3
+        :param md1,md2,md3: точки md инклинометрии, м
+        :param tvd1,tvd2,tvd3: точки tvd инклинометрии, м
+        :param d_i_1, d_i_2, d_i_3: внешний диаметр НКТ в соотв.точках md, мм
+        :param d_o_1, d_o_1, d_o_1: внутренний диаметр ЭК в соотв.точках md, мм
+        :param PVT: объект с PVT моделью
+        :param traj: объект с инклинометрией
 
+        :return: забойное давление, атм, распределение давления по стволу скважины
+        """
         pvt_model_data = {"black_oil": {"gamma_gas": gamma_gas, "gamma_wat": gamma_wat, "gamma_oil": gamma_oil,
                                          "rp": rp,
                                          "oil_correlations":
@@ -406,23 +434,23 @@ def schet(rp,qu_liq_r,wct_r,p_head_r,t_head_r , absep_r, gamma_gas, gamma_wat, g
                                         [md2, tvd2], [md3, tvd3]])
         trajectory = tr.Trajectory(md_tvd)
         d_o = pd.DataFrame(columns=["MD", "d_o"],
-                                    data=[[md1, d_o_1], [md1, d_o_1],
+                                    data=[[0, d_o_1], [md1, d_o_1],
                                     [md2, d_o_2], [md3, d_o_3]])
         d_i = pd.DataFrame(columns=["MD", "d_i"],
                                     data=[[0, d_i_1], [md1, d_i_1],
                                     [md2, d_i_2], [md3, d_i_3]])
         test3 = HasanKabirAnn(d_i_m = d_i_1, d_o_m = d_o_1, fluid = pvt, abseps= absep_r)
         vr = func_p_list(p_head = p_head_r, t_head=t_head_r, h=tvd3,
-                         PVT=pvt, traj=trajectory, corr = test3, d_o=d_o, d_i=d_i)
+                         PVT=pvt, traj=trajectory, corr = test3, d_o=d_o, d_i=d_i, md_tvd=md_tvd)
         vr1 = vr[0]
         vr2 = vr1[0]
         vr3= vr2[-1]
         return vr3/101325, vr2
 #TECT
 if __name__ == "__main__":
-    for i in range(0, 100,10):
-        ttt = schet(i,qu_liq_r=300, wct_r=0.6, p_head_r = (15*101325), t_head_r=293, absep_r = 2.54, md1 = 1400, md2 = 1800, md3 = 2400, tvd1 = 1400,
-                  tvd2 = 1800, tvd3=2400, gamma_gas = 0.7,gamma_wat = 1, gamma_oil=0.8, pb = (50 * 101325), t_res = 303.15,
+    for i in range(0, 10,10):
+        ttt = schet(i,qu_liq_r=300, wct_r=0.6, p_head_r = (15*101325), t_head_r=293, absep_r = 2.54, md1 = 2300, md2 = 2400, md3 =6000,
+                tvd1 =2300,tvd2 =2400, tvd3=2400, gamma_gas = 0.7,gamma_wat = 1, gamma_oil=0.8, pb = (50 * 101325), t_res = 303.15,
                   rsb = 50, muob = 0.5, bob = 1.5, d_o_1 = 142, d_o_2 = 142, d_o_3 = 142, d_i_1 = 73, d_i_2 = 73,
                   d_i_3 = 73,)[0]
         # lp = list(ttt)
