@@ -340,7 +340,10 @@ def grad_func(h, pt, PVT, traj, corr,d_o, d_i,md_tvd):
                 )(h)
         md_prev = md_steps[-1]
         md_steps.append(md)
-        theta = traj.calc_angle(md_prev,md)
+        h_steps = [0]
+        h_prev = h_steps[-1]
+        h_steps.append(h)
+        theta = traj.calc_angle(h_prev,h)
         # print(theta)
         PVT.calc_flow(pt[0],pt[1])
         corr.theta = theta
